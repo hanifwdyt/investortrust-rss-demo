@@ -11,8 +11,8 @@ export const CHANNELS = [
   { id: 'indepth', name: 'In-Depth', icon: '🔍', description: 'Laporan investigasi dan analisis mendalam' },
 ]
 
-export const DEFAULT_JSON_BASE_URL = 'https://engine.investortrust.id/api/interface/rss'
-export const DEFAULT_XML_BASE_URL = 'https://investortrust.id/rss'
+export const DEFAULT_JSON_BASE_URL = 'https://dev.engine.investortrust.id/api/interface/rss'
+export const DEFAULT_XML_BASE_URL = 'https://dev.investortrust.id/rss'
 export const SITE_URL = 'https://investortrust.id'
 
 export const SORT_OPTIONS = [
