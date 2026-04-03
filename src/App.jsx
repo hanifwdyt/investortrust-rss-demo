@@ -7,14 +7,13 @@ import Article from './pages/Article'
 import { useSettings } from './hooks/useSettings'
 
 function App() {
-  const { settings, updateSettings, toggleTheme } = useSettings()
+  const { settings, updateSettings } = useSettings()
   const [contentLevel, setContentLevel] = useState(null)
 
   return (
     <Layout
       settings={settings}
       updateSettings={updateSettings}
-      toggleTheme={toggleTheme}
       contentLevel={contentLevel}
     >
       <Routes>

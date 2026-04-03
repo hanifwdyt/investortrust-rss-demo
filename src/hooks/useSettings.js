@@ -8,7 +8,6 @@ const defaults = {
   jsonBaseUrl: DEFAULT_JSON_BASE_URL,
   xmlBaseUrl: DEFAULT_XML_BASE_URL,
   format: 'json',
-  theme: 'light',
 }
 
 function loadSettings() {
@@ -26,20 +25,9 @@ export function useSettings() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
   }, [settings])
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', settings.theme === 'dark')
-  }, [settings.theme])
-
   const updateSettings = useCallback((updates) => {
     setSettingsState(prev => ({ ...prev, ...updates }))
   }, [])
 
-  const toggleTheme = useCallback(() => {
-    setSettingsState(prev => ({
-      ...prev,
-      theme: prev.theme === 'dark' ? 'light' : 'dark',
-    }))
-  }, [])
-
-  return { settings, updateSettings, toggleTheme }
+  return { settings, updateSettings }
 }

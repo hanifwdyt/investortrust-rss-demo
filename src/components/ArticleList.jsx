@@ -5,7 +5,7 @@ export default function ArticleList({ items, loading, contentLevel }) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div key={i} className="bg-white rounded-[10px] border border-divider overflow-hidden">
             <div className="skeleton h-48 w-full" />
             <div className="p-5 space-y-3">
               <div className="skeleton h-5 w-3/4 rounded" />
@@ -26,7 +26,7 @@ export default function ArticleList({ items, loading, contentLevel }) {
     return (
       <div className="text-center py-16">
         <div className="text-4xl mb-4">📭</div>
-        <p className="text-gray-500 dark:text-gray-400">Tidak ada artikel ditemukan</p>
+        <p className="text-subtitle">Tidak ada artikel ditemukan</p>
       </div>
     )
   }

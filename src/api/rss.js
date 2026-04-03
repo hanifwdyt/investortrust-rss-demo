@@ -1,6 +1,18 @@
 import { DEFAULT_JSON_BASE_URL, DEFAULT_XML_BASE_URL } from '../utils/constants'
 import { parseRssXml } from '../utils/xmlParser'
 
+const ERROR_MESSAGES = {
+  401: 'API key tidak valid atau tidak ditemukan',
+  403: 'Akses ditolak — API key mungkin expired, inactive, atau tidak memiliki akses ke channel ini',
+  429: 'Rate limit tercapai — terlalu banyak request, coba lagi nanti',
+  404: 'Endpoint tidak ditemukan',
+  500: 'Server error — coba lagi nanti',
+}
+
+function getErrorMessage(status, serverError) {
+  return ERROR_MESSAGES[status] || serverError || `HTTP Error ${status}`
+}
+
 export async function fetchJsonFeed({
   channel,
   limit = 10,
@@ -28,6 +40,7 @@ export async function fetchJsonFeed({
       return {
         success: false,
         error: data.error || `HTTP ${res.status}`,
+        message: getErrorMessage(res.status, data.error),
         status: res.status,
         elapsed,
       }
@@ -43,11 +56,13 @@ export async function fetchJsonFeed({
       items,
       contentLevel,
       elapsed,
+      raw: data,
     }
   } catch (err) {
     return {
       success: false,
       error: err.message || 'Network error',
+      message: 'Gagal terhubung ke server. Periksa koneksi atau URL endpoint.',
       status: 0,
       elapsed: Math.round(performance.now() - start),
     }
@@ -74,6 +89,7 @@ export async function fetchXmlFeed({
       return {
         success: false,
         error: `HTTP ${res.status}`,
+        message: getErrorMessage(res.status),
         status: res.status,
         elapsed,
       }
@@ -88,12 +104,13 @@ export async function fetchXmlFeed({
       contentLevel,
       rowCount: parsed.items.length,
       elapsed,
-      rawXml: text,
+      raw: text,
     }
   } catch (err) {
     return {
       success: false,
       error: err.message || 'Network error',
+      message: 'Gagal terhubung ke server. Periksa koneksi atau URL endpoint.',
       status: 0,
       elapsed: Math.round(performance.now() - start),
     }

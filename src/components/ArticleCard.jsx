@@ -10,7 +10,7 @@ export default function ArticleCard({ article, showContent = false }) {
   const articleState = { article }
 
   return (
-    <article className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+    <article className="group bg-white rounded-[10px] border border-divider overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300">
       {thumbnail && (
         <Link to="/article" state={articleState} className="block overflow-hidden">
           <img
@@ -24,11 +24,11 @@ export default function ArticleCard({ article, showContent = false }) {
       )}
       <div className="p-5">
         <Link to="/article" state={articleState}>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors line-clamp-2 mb-2">
+          <h3 className="text-lg font-bold text-title group-hover:text-primary transition-colors line-clamp-2 mb-2">
             {title}
           </h3>
         </Link>
-        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-3">
+        <p className="text-sm text-desc line-clamp-3 mb-3">
           {description}
         </p>
 
@@ -38,13 +38,13 @@ export default function ArticleCard({ article, showContent = false }) {
               Baca selengkapnya
             </summary>
             <div
-              className="article-content mt-3 text-sm text-gray-700 dark:text-gray-300 border-t border-gray-100 dark:border-gray-700 pt-3"
+              className="article-content mt-3 text-sm text-desc border-t border-secondary pt-3"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </details>
         )}
 
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+        <div className="flex items-center justify-between text-xs text-subtitle">
           <div className="flex items-center gap-2">
             <span>{authorName}</span>
             <span>&middot;</span>
