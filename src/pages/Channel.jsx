@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { CHANNELS, SORT_OPTIONS } from '../utils/constants'
 import ArticleList from '../components/ArticleList'
 import ContentLevelBadge from '../components/ContentLevelBadge'
+import ChannelIcon from '../components/ChannelIcon'
 import { useRssFeed } from '../hooks/useRssFeed'
 
 export default function Channel({ settings, onContentLevel }) {
@@ -43,7 +44,11 @@ export default function Channel({ settings, onContentLevel }) {
           <span className="text-title">{channel?.name || name}</span>
         </div>
         <div className="flex items-center gap-4 mb-2">
-          {channel && <span className="text-4xl">{channel.icon}</span>}
+          {channel && (
+            <div className="w-12 h-12 rounded-full bg-primary/8 flex items-center justify-center shrink-0">
+              <ChannelIcon id={channel.id} size="lg" />
+            </div>
+          )}
           <div>
             <h1 className="text-3xl font-bold text-title">
               {channel?.name || name}
@@ -112,9 +117,9 @@ export default function Channel({ settings, onContentLevel }) {
           <Link
             key={ch.id}
             to={`/channel/${ch.id}`}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-secondary-light text-subtitle hover:bg-primary/10 hover:text-primary transition-colors border border-divider"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-secondary-light text-subtitle hover:bg-primary/10 hover:text-primary transition-colors border border-divider"
           >
-            <span>{ch.icon}</span>
+            <ChannelIcon id={ch.id} size="sm" />
             <span>{ch.name}</span>
           </Link>
         ))}
@@ -122,11 +127,16 @@ export default function Channel({ settings, onContentLevel }) {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 border border-red-200">
-          <p className="font-medium">{error.message || error.error}</p>
-          {error.status > 0 && (
-            <p className="text-sm mt-1">Status: {error.status} &middot; {error.elapsed}ms</p>
-          )}
+        <div className="flex items-start gap-3 bg-red-50 text-red-700 p-4 rounded-[10px] mb-6 border border-red-200">
+          <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="font-medium">{error.message || error.error}</p>
+            {error.status > 0 && (
+              <p className="text-sm mt-1 text-red-500">Status: {error.status} &middot; {error.elapsed}ms</p>
+            )}
+          </div>
         </div>
       )}
 
@@ -142,7 +152,7 @@ export default function Channel({ settings, onContentLevel }) {
         <div className="mt-8">
           <button
             onClick={() => setShowRaw(prev => !prev)}
-            className="text-sm text-primary hover:underline flex items-center gap-1"
+            className="text-sm text-primary hover:underline flex items-center gap-1.5 font-medium"
           >
             <svg className={`w-4 h-4 transition-transform ${showRaw ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -150,7 +160,7 @@ export default function Channel({ settings, onContentLevel }) {
             {showRaw ? 'Sembunyikan' : 'Tampilkan'} Raw Response
           </button>
           {showRaw && (
-            <pre className="mt-3 p-4 bg-gray-900 text-green-400 rounded-[10px] text-xs overflow-x-auto max-h-96 overflow-y-auto">
+            <pre className="mt-3 p-4 bg-gray-900 text-gray-300 rounded-[10px] text-xs overflow-x-auto max-h-96 overflow-y-auto font-mono leading-relaxed">
               {typeof data.raw === 'string' ? data.raw : JSON.stringify(data.raw, null, 2)}
             </pre>
           )}
