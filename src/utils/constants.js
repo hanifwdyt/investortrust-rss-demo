@@ -12,7 +12,7 @@ export const CHANNELS = [
 ]
 
 export const DEFAULT_JSON_BASE_URL = 'https://dev.engine.investortrust.id/api/interface/rss'
-export const DEFAULT_XML_BASE_URL = 'https://dev.investortrust.id/rss'
+export const DEFAULT_XML_BASE_URL = 'https://investortrust-uat.site/rss'
 export const SITE_URL = 'https://investortrust.id'
 
 export const SORT_OPTIONS = [
