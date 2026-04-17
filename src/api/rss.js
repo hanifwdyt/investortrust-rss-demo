@@ -32,7 +32,7 @@ export async function fetchJsonFeed({
   const start = performance.now()
 
   try {
-    const res = await fetch(url)
+    const res = await fetch(url, { cache: 'no-store' })
     const elapsed = Math.round(performance.now() - start)
     const data = await res.json()
 
@@ -82,7 +82,7 @@ export async function fetchXmlFeed({
   const start = performance.now()
 
   try {
-    const res = await fetch(url, { redirect: 'follow' })
+    const res = await fetch(url, { redirect: 'follow', cache: 'no-store' })
     const elapsed = Math.round(performance.now() - start)
 
     if (!res.ok) {
