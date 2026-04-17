@@ -47,14 +47,14 @@ export async function fetchJsonFeed({
     }
 
     const items = (data.news || []).map(normalizeJsonItem)
-    const contentLevel = detectContentLevel(items)
+    const grantedFields = aggregateGrantedFields(items)
 
     return {
       success: true,
       title: data.title_channel || '',
       rowCount: data.row_count || items.length,
       items,
-      contentLevel,
+      grantedFields,
       elapsed,
       raw: data,
     }
@@ -97,11 +97,11 @@ export async function fetchXmlFeed({
 
     const text = await res.text()
     const parsed = parseRssXml(text)
-    const contentLevel = detectContentLevel(parsed.items)
+    const grantedFields = aggregateGrantedFields(parsed.items)
 
     return {
       ...parsed,
-      contentLevel,
+      grantedFields,
       rowCount: parsed.items.length,
       elapsed,
       raw: text,
@@ -126,13 +126,24 @@ function normalizeJsonItem(item) {
     url: item.url_news || '',
     thumbnail: item.thumbnail || null,
     content: item.content || null,
+    backlinks: Array.isArray(item.backlinks) ? item.backlinks : [],
   }
 }
 
-function detectContentLevel(items) {
-  if (!items || items.length === 0) return 'title'
-  const first = items[0]
-  if (first.content) return 'full'
-  if (first.thumbnail) return 'summary'
-  return 'title'
+function detectItemFields(item) {
+  const fields = new Set()
+  if (item.title) fields.add('title')
+  if (item.thumbnail) fields.add('thumbnail')
+  if (item.content) fields.add('content')
+  if (item.backlinks && item.backlinks.length > 0) fields.add('backlink')
+  return fields
+}
+
+function aggregateGrantedFields(items) {
+  const granted = new Set()
+  if (!items) return granted
+  for (const it of items) {
+    for (const f of detectItemFields(it)) granted.add(f)
+  }
+  return granted
 }

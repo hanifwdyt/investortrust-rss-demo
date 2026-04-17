@@ -18,6 +18,8 @@ export function parseRssXml(xmlText) {
     )[0]?.textContent
 
     const enclosure = item.querySelector('enclosure')
+    const backlinks = extractBacklinksFromHtml(contentEncoded)
+    const content = stripBacklinksFromHtml(contentEncoded)
 
     return {
       title: getText('title'),
@@ -26,7 +28,8 @@ export function parseRssXml(xmlText) {
       author: getText('author'),
       url: getText('link'),
       thumbnail: enclosure?.getAttribute('url') || null,
-      content: contentEncoded || null,
+      content: content || null,
+      backlinks,
     }
   })
 
@@ -34,5 +37,30 @@ export function parseRssXml(xmlText) {
     success: true,
     title: channel.querySelector('title')?.textContent || '',
     items,
+  }
+}
+
+function extractBacklinksFromHtml(html) {
+  if (!html) return []
+  try {
+    const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html')
+    const nodes = doc.querySelectorAll('blockquote.internal-link-embed')
+    return Array.from(nodes).map(n => ({
+      url: n.getAttribute('data-url') || '',
+      title: n.getAttribute('data-title') || n.textContent?.trim() || '',
+    })).filter(b => b.url)
+  } catch {
+    return []
+  }
+}
+
+function stripBacklinksFromHtml(html) {
+  if (!html) return html
+  try {
+    const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html')
+    doc.querySelectorAll('blockquote.internal-link-embed').forEach(n => n.remove())
+    return doc.body.firstChild?.innerHTML || html
+  } catch {
+    return html
   }
 }

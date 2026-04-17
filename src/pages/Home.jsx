@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { CHANNELS } from '../utils/constants'
+import { CHANNELS, CONTENT_FIELDS, TIER_PRESETS } from '../utils/constants'
 import ChannelCard from '../components/ChannelCard'
 import ArticleList from '../components/ArticleList'
 import { useRssFeed } from '../hooks/useRssFeed'
@@ -11,53 +11,7 @@ const CHECK_ICON = (
   </svg>
 )
 
-const TIERS = [
-  {
-    name: 'Basic',
-    highlight: false,
-    badge: 'bg-gray-500',
-    border: 'border-divider',
-    bg: 'bg-white',
-    features: [
-      { label: 'Content Level', value: 'Title Only' },
-      { label: 'Max Items', value: '10 / request' },
-      { label: 'Data Delay', value: '60 menit' },
-      { label: 'Rate Limit', value: '100 req/jam' },
-      { label: 'Akses Channel', value: 'Terbatas' },
-    ],
-  },
-  {
-    name: 'Standard',
-    highlight: true,
-    popular: true,
-    badge: 'bg-primary',
-    border: 'border-primary',
-    bg: 'bg-primary/3',
-    features: [
-      { label: 'Content Level', value: 'Summary + Thumbnail' },
-      { label: 'Max Items', value: '25 / request' },
-      { label: 'Data Delay', value: '15 menit' },
-      { label: 'Rate Limit', value: '500 req/jam' },
-      { label: 'Akses Channel', value: 'Sebagian besar' },
-    ],
-  },
-  {
-    name: 'Premium',
-    highlight: false,
-    badge: 'bg-amber-500',
-    border: 'border-amber-300',
-    bg: 'bg-amber-50/50',
-    features: [
-      { label: 'Content Level', value: 'Full Content' },
-      { label: 'Max Items', value: '50 / request' },
-      { label: 'Data Delay', value: 'Real-time' },
-      { label: 'Rate Limit', value: '2.000 req/jam' },
-      { label: 'Akses Channel', value: 'Semua channel' },
-    ],
-  },
-]
-
-export default function Home({ settings }) {
+export default function Home({ settings, onGrantedFields }) {
   const { data, loading, error, fetchFeed } = useRssFeed()
 
   useEffect(() => {
@@ -70,6 +24,10 @@ export default function Home({ settings }) {
       xmlBaseUrl: settings.xmlBaseUrl,
     })
   }, [settings.apikey, settings.format, settings.jsonBaseUrl, settings.xmlBaseUrl])
+
+  useEffect(() => {
+    if (data?.grantedFields) onGrantedFields?.(data.grantedFields)
+  }, [data?.grantedFields])
 
   return (
     <div>
@@ -89,7 +47,7 @@ export default function Home({ settings }) {
           Demonstrasi integrasi RSS Feed dari InvestorTrust
         </p>
         <p className="text-sm text-desc max-w-xl mx-auto mb-8">
-          Platform ini menunjukkan bagaimana partner dapat mengkonsumsi berita melalui RSS Feed dengan tiered access content.
+          Platform ini menunjukkan bagaimana partner dapat mengkonsumsi berita dengan granular content fields berbasis konfigurasi API key.
         </p>
         {!settings.apikey && (
           <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2.5 rounded-lg text-sm border border-amber-200">
@@ -101,44 +59,102 @@ export default function Home({ settings }) {
         )}
       </section>
 
-      {/* Tier Comparison */}
-      <section className="mb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-title mb-2">Partner Tier System</h2>
-          <p className="text-subtitle text-sm">Akses konten berdasarkan tier partnership</p>
+      {/* Content Fields Legend */}
+      <section className="mb-10">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-title mb-2">Granular Content Fields</h2>
+          <p className="text-subtitle text-sm max-w-2xl mx-auto">
+            Partner config menentukan field apa saja yang di-expose per request. Kombinasi fleksibel — bukan sekadar 3 tier fixed.
+          </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {TIERS.map(tier => (
-            <div
-              key={tier.name}
-              className={`relative rounded-[10px] border-2 p-6 ${tier.border} ${tier.bg} ${tier.highlight ? 'md:-mt-2 md:mb-[-8px] shadow-lg' : ''} transition-all`}
-            >
-              {tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
-                    Recommended
-                  </span>
-                </div>
-              )}
-              <div className="text-center mb-6 pt-1">
-                <span className={`${tier.badge} text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide`}>
-                  {tier.name}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
+          {CONTENT_FIELDS.map(f => (
+            <div key={f.key} className="bg-white rounded-[10px] border border-divider p-4">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-primary text-white text-xs font-bold">
+                  {f.short}
                 </span>
+                <span className="font-semibold text-title text-sm">{f.label}</span>
               </div>
-              <div className="space-y-3">
-                {tier.features.map((feat) => (
-                  <div key={feat.label} className="flex items-center gap-3 text-sm">
-                    {CHECK_ICON}
-                    <span className="text-subtitle">{feat.label}</span>
-                    <span className="font-medium text-title ml-auto text-right">{feat.value}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-desc leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Tier Comparison */}
+      <section className="mb-16">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-bold text-title mb-2">Partner Tier Preset</h2>
+          <p className="text-subtitle text-sm">Kombinasi granular fields yang umum ditawarkan</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {TIER_PRESETS.map(tier => {
+            const tierFields = new Set(tier.fields)
+            return (
+              <div
+                key={tier.name}
+                className={`relative rounded-[10px] border-2 p-6 ${tier.border} ${tier.bg} ${tier.highlight ? 'md:-mt-2 md:mb-[-8px] shadow-lg' : ''} transition-all`}
+              >
+                {tier.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-primary text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                      Recommended
+                    </span>
+                  </div>
+                )}
+                <div className="text-center mb-5 pt-1">
+                  <span className={`${tier.badge} text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide`}>
+                    {tier.name}
+                  </span>
+                </div>
+
+                {/* Field matrix */}
+                <div className="mb-5 p-3 rounded-lg bg-white/70 border border-divider/70">
+                  <div className="text-[10px] uppercase tracking-wider text-subtitle font-semibold mb-2 text-center">
+                    Content Fields
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {CONTENT_FIELDS.map(f => {
+                      const granted = tierFields.has(f.key)
+                      return (
+                        <div
+                          key={f.key}
+                          className={[
+                            'flex flex-col items-center gap-1 py-2 rounded',
+                            granted ? 'bg-primary/10' : 'bg-gray-50',
+                          ].join(' ')}
+                          title={`${f.label} — ${granted ? 'included' : 'not included'}`}
+                        >
+                          <span
+                            className={[
+                              'w-6 h-6 inline-flex items-center justify-center rounded text-[10px] font-bold',
+                              granted ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400',
+                            ].join(' ')}
+                          >
+                            {f.short}
+                          </span>
+                          <span className={`text-[10px] ${granted ? 'text-title font-medium' : 'text-subtitle'}`}>
+                            {f.label}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  <TierRow label="Max Items" value={tier.maxItems} />
+                  <TierRow label="Data Delay" value={tier.dataDelay} />
+                  <TierRow label="Rate Limit" value={tier.rateLimit} />
+                  <TierRow label="Akses Channel" value={tier.channels} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
         <p className="text-center text-xs text-subtitle mt-5">
-          * Nilai tier bersifat ilustratif. Konfigurasi aktual per partner dapat disesuaikan.
+          * Nilai tier bersifat ilustratif. Admin dapat atur kombinasi granular per partner via CMS.
         </p>
       </section>
 
@@ -179,14 +195,30 @@ export default function Home({ settings }) {
         <ArticleList
           items={data?.items}
           loading={loading}
-          contentLevel={data?.contentLevel}
+          grantedFields={data?.grantedFields}
         />
         {data && (
           <div className="mt-4 text-center text-xs text-subtitle">
-            {data.rowCount} artikel &middot; Content level: {data.contentLevel} &middot; {data.elapsed}ms
+            {data.rowCount} artikel &middot; {fieldsSummary(data.grantedFields)} &middot; {data.elapsed}ms
           </div>
         )}
       </section>
     </div>
   )
+}
+
+function TierRow({ label, value }) {
+  return (
+    <div className="flex items-center gap-3 text-sm">
+      {CHECK_ICON}
+      <span className="text-subtitle">{label}</span>
+      <span className="font-medium text-title ml-auto text-right">{value}</span>
+    </div>
+  )
+}
+
+function fieldsSummary(grantedFields) {
+  if (!grantedFields || grantedFields.size === 0) return 'No fields'
+  const labels = CONTENT_FIELDS.filter(f => grantedFields.has(f.key)).map(f => f.label)
+  return labels.join(' + ')
 }

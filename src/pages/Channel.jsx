@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { CHANNELS, SORT_OPTIONS } from '../utils/constants'
+import { CHANNELS, CONTENT_FIELDS, SORT_OPTIONS } from '../utils/constants'
 import ArticleList from '../components/ArticleList'
-import ContentLevelBadge from '../components/ContentLevelBadge'
+import GrantedFieldsBadge from '../components/GrantedFieldsBadge'
 import ChannelIcon from '../components/ChannelIcon'
 import { useRssFeed } from '../hooks/useRssFeed'
 
-export default function Channel({ settings, onContentLevel }) {
+export default function Channel({ settings, onGrantedFields }) {
   const { name } = useParams()
   const channel = CHANNELS.find(c => c.id === name)
-  const { data, loading, error, rawResponse, fetchFeed } = useRssFeed()
+  const { data, loading, error, fetchFeed } = useRssFeed()
   const [showRaw, setShowRaw] = useState(false)
 
   const isXml = settings.format === 'xml'
@@ -18,8 +18,8 @@ export default function Channel({ settings, onContentLevel }) {
   const [sortOrder, setSortOrder] = useState('DESC')
 
   useEffect(() => {
-    if (data?.contentLevel) onContentLevel(data.contentLevel)
-  }, [data?.contentLevel])
+    if (data?.grantedFields) onGrantedFields?.(data.grantedFields)
+  }, [data?.grantedFields])
 
   useEffect(() => {
     fetchFeed({
@@ -101,15 +101,34 @@ export default function Channel({ settings, onContentLevel }) {
           <span className="text-xs text-amber-600">XML format menggunakan default sorting dari server</span>
         )}
 
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-3 ml-auto">
           {data && (
             <>
-              <ContentLevelBadge level={data.contentLevel} />
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wide text-subtitle font-semibold">Fields</span>
+                <GrantedFieldsBadge grantedFields={data.grantedFields} size="sm" />
+              </div>
               <span className="text-xs text-subtitle">{data.rowCount} items &middot; {data.elapsed}ms</span>
             </>
           )}
         </div>
       </div>
+
+      {/* Field summary */}
+      {data?.grantedFields && (
+        <div className="mb-6 p-3 rounded-[10px] bg-primary/5 border border-primary/20 text-xs text-subtitle">
+          <strong className="text-title">Fields yang di-expose:</strong>{' '}
+          {CONTENT_FIELDS.filter(f => data.grantedFields.has(f.key)).map(f => f.label).join(', ') || 'Tidak ada'}
+          {data.grantedFields.size < CONTENT_FIELDS.length && (
+            <>
+              {' '}&middot; <span className="text-desc">
+                Missing:{' '}
+                {CONTENT_FIELDS.filter(f => !data.grantedFields.has(f.key)).map(f => f.label).join(', ')}
+              </span>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Other channels */}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -144,7 +163,7 @@ export default function Channel({ settings, onContentLevel }) {
       <ArticleList
         items={data?.items}
         loading={loading}
-        contentLevel={data?.contentLevel}
+        grantedFields={data?.grantedFields}
       />
 
       {/* Raw Response Viewer */}

@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
-import ContentLevelBadge from './ContentLevelBadge'
+import GrantedFieldsBadge from './GrantedFieldsBadge'
 
-export default function Navbar({ settings, onOpenSettings, contentLevel }) {
+export default function Navbar({ settings, onOpenSettings, grantedFields }) {
   const location = useLocation()
 
   return (
@@ -21,7 +21,12 @@ export default function Navbar({ settings, onOpenSettings, contentLevel }) {
           </div>
 
           <div className="flex items-center gap-3">
-            {contentLevel && <ContentLevelBadge level={contentLevel} />}
+            {grantedFields && grantedFields.size > 0 && (
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wide text-subtitle font-semibold">Fields</span>
+                <GrantedFieldsBadge grantedFields={grantedFields} size="sm" />
+              </div>
+            )}
             {settings.apikey && (
               <span className="text-xs text-green-600 hidden sm:block">
                 API Key Active

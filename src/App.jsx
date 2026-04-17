@@ -8,19 +8,19 @@ import { useSettings } from './hooks/useSettings'
 
 function App() {
   const { settings, updateSettings } = useSettings()
-  const [contentLevel, setContentLevel] = useState(null)
+  const [grantedFields, setGrantedFields] = useState(null)
 
   return (
     <Layout
       settings={settings}
       updateSettings={updateSettings}
-      contentLevel={contentLevel}
+      grantedFields={grantedFields}
     >
       <Routes>
-        <Route path="/" element={<Home settings={settings} />} />
+        <Route path="/" element={<Home settings={settings} onGrantedFields={setGrantedFields} />} />
         <Route
           path="/channel/:name"
-          element={<Channel settings={settings} onContentLevel={setContentLevel} />}
+          element={<Channel settings={settings} onGrantedFields={setGrantedFields} />}
         />
         <Route path="/article" element={<Article />} />
       </Routes>

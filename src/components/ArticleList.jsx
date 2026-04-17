@@ -1,6 +1,6 @@
 import ArticleCard from './ArticleCard'
 
-export default function ArticleList({ items, loading, contentLevel }) {
+export default function ArticleList({ items, loading, grantedFields }) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -33,7 +33,8 @@ export default function ArticleList({ items, loading, contentLevel }) {
     )
   }
 
-  const showContent = contentLevel === 'full'
+  const showContent = grantedFields?.has('content') ?? false
+  const showBacklinks = grantedFields?.has('backlink') ?? false
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -42,6 +43,7 @@ export default function ArticleList({ items, loading, contentLevel }) {
           key={`${article.url}-${i}`}
           article={article}
           showContent={showContent}
+          showBacklinks={showBacklinks}
         />
       ))}
     </div>

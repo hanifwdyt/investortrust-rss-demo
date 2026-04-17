@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Navbar from './Navbar'
 import SettingsModal from './SettingsModal'
 
-export default function Layout({ children, settings, updateSettings, contentLevel }) {
+export default function Layout({ children, settings, updateSettings, grantedFields }) {
   const [showSettings, setShowSettings] = useState(false)
 
   return (
@@ -10,7 +10,7 @@ export default function Layout({ children, settings, updateSettings, contentLeve
       <Navbar
         settings={settings}
         onOpenSettings={() => setShowSettings(true)}
-        contentLevel={contentLevel}
+        grantedFields={grantedFields}
       />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {children}
